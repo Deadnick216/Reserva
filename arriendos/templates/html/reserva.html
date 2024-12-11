@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacer una Reserva</title>
+</head>
+<body>
+    <h1>Formulario de Reserva</h1>
+    <form action="/api/reservas/" method="POST">
+        {% csrf_token %}
+        
+        <label for="habitacion">Número de Habitación:</label>
+        <select id="habitacion" name="habitacion" required>
+            {% for i in 1|to:20 %}
+                <option value="{{ i }}">Habitación {{ i }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="fecha_inicio">Fecha de Inicio:</label>
+        <input type="date" id="fecha_inicio" name="fecha_inicio" required><br><br>
+
+        <label for="fecha_fin">Fecha de Fin:</label>
+        <input type="date" id="fecha_fin" name="fecha_fin" required><br><br>
+
+        <label for="usuario">Nombre del Usuario:</label>
+        <input type="text" id="usuario" name="usuario" required><br><br>
+
+        <label for="total_pago">Total a Pagar:</label>
+        <input type="number" id="total_pago" name="total_pago" step="0.01" required><br><br>
+
+        <label for="estado">Estado:</label>
+        <select id="estado" name="estado" required>
+            <option value="pendiente">Pendiente</option>
+            <option value="pagado">Pagado</option>
+        </select><br><br>
+
+        <button type="submit">Hacer Reserva</button>
+    </form>
+</body>
+</html>

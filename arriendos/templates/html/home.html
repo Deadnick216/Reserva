@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Inicio</title>
+</head>
+<body>
+    <h1>Bienvenido al Arriendo de Habitaciones</h1>
+
+    <!-- Botón para ir al listado de habitaciones -->
+    <a href="{% url 'listado_habitaciones' %}">
+        <button>Ver Habitaciones Disponibles</button>
+    </a>
+
+    <!-- Enlace al formulario de reserva -->
+    <br><br>
+    <a href="{% url 'reserva_formulario' habitacion_id=1 %}">
+        <button>Reservar Habitacion 1</button>
+    </a>
+
+</body>
+</html>

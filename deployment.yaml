@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+spec:
+  replicas: 2  # Puedes ajustar el número de réplicas según lo que necesites
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+        - name: django-container
+          image: tu_usuario_docker/mi_imagen_django:latest  # Nombre de tu imagen en Docker Hub o en tu repositorio de imágenes
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "postgres://usuario:contraseña@nombre_host:puerto/base_datos"  # Aquí se conecta con tu base de datos
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+spec:
+  selector:
+    app: django-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer  # Puedes usar ClusterIP o NodePort si no es necesario un balanceador de carga

@@ -1,0 +1,38 @@
+<!-- listado_habitaciones.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Habitaciones</title>
+</head>
+<body>
+    <h1>Listado de Habitaciones</h1>
+
+    <!-- Botón para agregar una nueva habitación -->
+    <a href="{% url 'agregar_habitacion' %}">
+        <button>Agregar Nueva Habitacion</button>
+    </a>
+
+    <!-- Tabla para mostrar las habitaciones -->
+    <table>
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for habitacion in habitaciones %}
+                <tr>
+                    <td>{{ habitacion.numero }}</td>
+                    <td>{{ habitacion.descripcion }}</td>
+                    <td>${{ habitacion.precio }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
