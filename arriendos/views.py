@@ -2,16 +2,15 @@ from rest_framework import viewsets
 from .models import Habitacion, Reserva, Pago
 from .serializers import HabitacionSerializer, ReservaSerializer, PagoSerializer
 from django.http import HttpResponse
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.shortcuts import render, get_object_or_404
-from .forms import ReservaForm  # Suponiendo que tienes un formulario para la reserva
-from django.shortcuts import render
-from django.shortcuts import render, redirect
+from .forms import ReservaForm
+from django.shortcuts import redirect
 from .models import Habitacion
 from .forms import HabitacionForm
-
+from django.shortcuts import render
+from .models import Reserva  
 
 class HabitacionViewSet(viewsets.ModelViewSet):
     queryset = Habitacion.objects.all()
@@ -55,27 +54,26 @@ def reserva_formulario(request, habitacion_id):
 
 # Vista para mostrar la lista de habitaciones disponibles
 def listado_habitaciones(request):
-    habitaciones = Habitacion.objects.filter(disponible=True)  # Filtramos solo las habitaciones disponibles
-    return render(request, 'listado_habitaciones.html', {
-        'habitaciones': habitaciones
-    })
+    habitaciones = Habitacion.objects.filter(estado='Disponible')  # Filtramos por habitaciones disponibles
+    return render(request, 'listado_habitaciones.html', {'habitaciones': habitaciones})
 
 # Vista principal de la aplicación
 def home(request):
     return render(request, 'home.html')
 
-# Vista para crear una reserva mediante la API
 @api_view(['POST'])
 def crear_reserva(request):
     if request.method == 'POST':
-        habitacion_numero = request.data.get('habitacion')  # Ahora se recibe un número
-        habitacion = Habitacion.objects.get(numero=habitacion_numero)  # Buscar por número de habitación
-        fecha_inicio = request.data.get('fecha_inicio')
-        fecha_fin = request.data.get('fecha_fin')
-        usuario = request.data.get('usuario')
-        total_pago = request.data.get('total_pago')
-        estado = request.data.get('estado')
+        # Recibe los datos del formulario
+        habitacion_id = request.POST.get('habitacion_id')  # Este ID debe venir desde el formulario
+        habitacion = Habitacion.objects.get(id=habitacion_id)
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        usuario = request.POST.get('usuario')
+        total_pago = request.POST.get('total_pago')
+        estado = request.POST.get('estado')
 
+        # Crear la reserva
         reserva = Reserva.objects.create(
             habitacion=habitacion,
             fecha_inicio=fecha_inicio,
@@ -85,14 +83,12 @@ def crear_reserva(request):
             estado=estado
         )
 
-        # Serializar la reserva para devolverla como respuesta
-        serializer = ReservaSerializer(reserva)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Cambiar el estado de la habitación a 'Reservada'
+        habitacion.estado = 'Reservada'
+        habitacion.save()
 
-def listado_habitaciones(request):
-    habitaciones = Habitacion.objects.all()
-    return render(request, 'html/listado_habitaciones.html', {'habitaciones': habitaciones})
-
+        # Mostrar un mensaje de éxito
+        return HttpResponse("Reserva realizada con éxito.")
 
 def agregar_habitacion(request):
     if request.method == 'POST':
@@ -104,3 +100,70 @@ def agregar_habitacion(request):
         form = HabitacionForm()
 
     return render(request, 'html/agregar_habitacion.html', {'form': form})
+
+# Vista para reservar una habitación
+def reservar_habitacion(request):
+    if request.method == "POST":
+        habitacion_id = request.POST.get("habitacion_id")  # Obtenemos el ID de la habitación
+        habitacion = Habitacion.objects.get(id=habitacion_id)  # Obtenemos la habitación por ID
+        habitacion.estado = "Reservada"  # Cambiamos el estado a "Reservada"
+        habitacion.save()  # Guardamos los cambios
+        return redirect('listado_habitaciones')  # Redirigimos a la vista de listado de habitaciones
+
+    habitaciones = Habitacion.objects.all()  # Traemos todas las habitaciones
+    return render(request, 'html/reservar_habitacion.html', {'habitaciones': habitaciones})
+
+def registrar_habitacion(request):
+    if request.method == 'POST':
+        # Obtén los datos del formulario
+        nombre = request.POST['nombre']
+        descripcion = request.POST['descripcion']
+        precio = request.POST['precio']
+        capacidad = request.POST['capacidad']
+        estado = request.POST.get('estado', 'Disponible')
+
+        # Crear la nueva habitación
+        Habitacion.objects.create(
+            nombre=nombre,
+            descripcion=descripcion,
+            precio=precio,
+            capacidad=capacidad,
+            estado=estado,
+        )
+
+        # Redirigir al listado de habitaciones después de registrar
+        return redirect('listado_habitaciones')  # Redirige a la ruta de listado de habitaciones
+
+    return render(request, 'registrar_habitacion.html')
+
+def detalle_reserva(request, habitacion_id):
+    # Obtener la habitación usando el ID
+    habitacion = get_object_or_404(Habitacion, id=habitacion_id)
+    
+    if request.method == 'POST':
+        form = ReservaForm(request.POST)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.habitacion = habitacion
+            reserva.save()
+            # Redirigir a una página de confirmación o el listado de reservas
+            return redirect('confirmacion_reserva', reserva.id)
+    else:
+        form = ReservaForm()
+
+    return render(request, 'detalle_reserva.html', {'habitacion': habitacion, 'form': form})
+
+
+def confirmacion_reserva(request, reserva_id):
+    try:
+        # Buscar la reserva por su ID
+        reserva = Reserva.objects.get(id=reserva_id)
+        # Renderizar la plantilla con los detalles de la reserva
+        return render(request, 'confirmacion_reserva.html', {'reserva': reserva})
+    except Reserva.DoesNotExist:
+        # Si no se encuentra la reserva, devolver un error 404
+        return render(request, '404.html', {'message': 'Reserva no encontrada'}, status=404)
+
+def confirmacion_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    return render(request, 'confirmacion_reserva.html', {'reserva': reserva})

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservado</title>
+    <script>
+        // Muestra un popup con el mensaje
+        alert("{{ message }}");
+        // Redirige a la URL especificada después de cerrar el popup
+        window.location.href = "{{ redirect_url }}";
+    </script>
+</head>
+<body>
+    <!-- Mensaje alternativo para navegadores sin soporte de JavaScript -->
+    <noscript>
+        <p>{{ message }}</p>
+        <a href="{{ redirect_url }}">Haga clic aquí para volver al inicio</a>
+    </noscript>
+</body>
+</html>

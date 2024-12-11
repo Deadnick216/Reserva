@@ -1,23 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Inicio</title>
+    <title>Home</title>
 </head>
 <body>
-    <h1>Bienvenido al Arriendo de Habitaciones</h1>
-
-    <!-- Botón para ir al listado de habitaciones -->
-    <a href="{% url 'listado_habitaciones' %}">
-        <button>Ver Habitaciones Disponibles</button>
-    </a>
-
-    <!-- Enlace al formulario de reserva -->
-    <br><br>
-    <a href="{% url 'reserva_formulario' habitacion_id=1 %}">
-        <button>Reservar Habitacion 1</button>
-    </a>
-
+    <h1>Bienvenido</h1>
+    <div style="display: flex; gap: 20px; justify-content: center;">
+        <form action="{% url 'listado_habitaciones' %}" method="get">
+            <button type="submit" style="padding: 10px 20px; font-size: 16px;">Reservar una Habitación</button>
+        </form>
+        <form action="{% url 'registrar_habitacion' %}" method="get">
+            <button type="submit" style="padding: 10px 20px; font-size: 16px;">Registrar una Habitación</button>
+        </form>
+    </div>
 </body>
 </html>

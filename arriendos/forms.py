@@ -12,4 +12,4 @@ class ReservaForm(forms.ModelForm):
 class HabitacionForm(forms.ModelForm):
     class Meta:
         model = Habitacion
-        fields = ['numero', 'nombre', 'descripcion', 'precio', 'disponible']
+        fields = ['nombre', 'descripcion', 'precio', 'capacidad', 'estado', 'direccion']

@@ -1,14 +1,15 @@
 from django.db import models
 
 class Habitacion(models.Model):
-    numero = models.IntegerField(unique=True)  # Número único de habitación
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    disponible = models.BooleanField(default=True)  # Indicador de disponibilidad
+    capacidad = models.IntegerField()
+    estado = models.CharField(max_length=20, choices=[('Disponible', 'Disponible'), ('Reservada', 'Reservada')], default='Disponible')
+    direccion = models.CharField(max_length=255)  # Campo para la dirección de la habitación
 
     def __str__(self):
-        return f"Habitación {self.numero} - {self.nombre}"
+        return f'{self.nombre} - {self.estado}'
         
 class Reserva(models.Model):
     habitacion = models.ForeignKey(Habitacion, on_delete=models.CASCADE)

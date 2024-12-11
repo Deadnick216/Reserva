@@ -19,10 +19,13 @@
                     <p>Precio: ${{ habitacion.precio }}</p>
                     <p>Capacidad: {{ habitacion.capacidad }} personas</p>
                     
-                    <!-- Redirigir al formulario de reserva -->
-                    <a href="{% url 'detalle_reserva' habitacion.id %}">
-                        <button type="button">Reservar</button>
-                    </a>
+                    <!-- Formulario para reservar la habitación -->
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="habitacion_id" value="{{ habitacion.id }}">
+                        <button type="submit">Reservar</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
