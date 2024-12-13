@@ -6,7 +6,7 @@ from .models import Habitacion  # Asegúrate de que tienes un modelo llamado Res
 class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = ['fecha_inicio', 'fecha_fin', 'habitacion', 'usuario', 'total_pago', 'estado'] 
+        fields = ['fecha_inicio', 'fecha_fin', 'habitacion', 'usuario'] 
 
 
 class HabitacionForm(forms.ModelForm):

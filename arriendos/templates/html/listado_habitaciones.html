@@ -4,6 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva de Habitaciones</title>
+    <style>
+        /* Estilo general para el body */
+        body {
+            background-color: #E0F7FA; /* Fondo celeste suave */
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Estilo para el título */
+        h1 {
+            font-size: 32px;
+            color: #00796B;
+            margin-bottom: 30px;
+        }
+
+        /* Estilo para la lista de habitaciones */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        /* Estilo para cada tarjeta de habitación */
+        .habitacion-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            margin: 15px auto;
+            padding: 15px;
+            width: 80%; /* Ancho flexible */
+            max-width: 500px; /* Máximo ancho */
+            text-align: left;
+        }
+
+        /* Estilo para el nombre de la habitación */
+        .habitacion-card h3 {
+            font-size: 24px;
+            color: #00796B;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo para los párrafos dentro de la tarjeta */
+        .habitacion-card p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        /* Estilo para los botones */
+        button {
+            background-color: white;
+            border: 2px solid #4CAF50;
+            padding: 12px 25px;
+            font-size: 18px;
+            color: #4CAF50;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Botón de vuelta al inicio */
+        .back-button {
+            margin-top: 20px;
+            background-color: white;
+            border: 2px solid #00796B;
+            padding: 12px 25px;
+            font-size: 18px;
+            color: #00796B;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #00796B;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,15 +97,18 @@
         <ul>
             {% for habitacion in habitaciones %}
                 <li>
-                    <h3>{{ habitacion.nombre }}</h3>
-                    <p>Descripción: {{ habitacion.descripcion }}</p>
-                    <p>Precio: ${{ habitacion.precio }}</p>
-                    <p>Capacidad: {{ habitacion.capacidad }} personas</p>
-                    
-                    <!-- Redirigir al formulario de reserva -->
-                    <a href="{% url 'detalle_reserva' habitacion.id %}">
-                        <button type="button">Reservar</button>
-                    </a>
+                    <!-- Tarjeta de cada habitación -->
+                    <div class="habitacion-card">
+                        <h3>{{ habitacion.nombre }}</h3>
+                        <p><strong>Descripción:</strong> {{ habitacion.descripcion }}</p>
+                        <p><strong>Precio:</strong> ${{ habitacion.precio }}</p>
+                        <p><strong>Capacidad:</strong> {{ habitacion.capacidad }} personas</p>
+                        
+                        <!-- Redirigir al formulario de reserva -->
+                        <a href="{% url 'detalle_reserva' habitacion.id %}">
+                            <button type="button">Reservar</button>
+                        </a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -32,7 +118,7 @@
 
     <!-- Botón que redirige a la página de inicio -->
     <a href="{% url 'home' %}">
-        <button type="button">Volver al Inicio</button>
+        <button class="back-button" type="button">Volver al Inicio</button>
     </a>
 
 </body>

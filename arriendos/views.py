@@ -11,6 +11,15 @@ from .models import Habitacion
 from .forms import HabitacionForm
 from django.shortcuts import render
 from .models import Reserva  
+from django.test import TestCase
+from django.urls import reverse
+
+
+class ReservaViewTests(TestCase):
+    def test_detalle_reserva(self):
+        response = self.client.get(reverse('detalle_reserva', kwargs={'habitacion_id': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Reserva')
 
 class HabitacionViewSet(viewsets.ModelViewSet):
     queryset = Habitacion.objects.all()
@@ -47,7 +56,7 @@ def reserva_formulario(request, habitacion_id):
     else:
         form = ReservaForm()
 
-    return render(request, 'formulario_reserva.html', {
+    return render(request, 'detalle_reserva.html', {
         'habitacion': habitacion,
         'form': form
     })
@@ -137,22 +146,30 @@ def registrar_habitacion(request):
     return render(request, 'registrar_habitacion.html')
 
 def detalle_reserva(request, habitacion_id):
-    # Obtener la habitación usando el ID
     habitacion = get_object_or_404(Habitacion, id=habitacion_id)
     
     if request.method == 'POST':
         form = ReservaForm(request.POST)
+        
         if form.is_valid():
             reserva = form.save(commit=False)
             reserva.habitacion = habitacion
             reserva.save()
-            # Redirigir a una página de confirmación o el listado de reservas
-            return redirect('confirmacion_reserva', reserva.id)
+            
+            # Cambiar el estado de la habitación a "Reservada"
+            habitacion.estado = 'Reservada'
+            habitacion.save()
+
+            # Mensaje de éxito
+            messages.success(request, "¡Reserva realizada con éxito!")
+
+            # Redirigir a la página de inicio
+            return redirect('home')  # Redirige a la página principal donde se muestra el mensaje
+
     else:
         form = ReservaForm()
 
     return render(request, 'detalle_reserva.html', {'habitacion': habitacion, 'form': form})
-
 
 def confirmacion_reserva(request, reserva_id):
     try:
@@ -167,3 +184,29 @@ def confirmacion_reserva(request, reserva_id):
 def confirmacion_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
     return render(request, 'confirmacion_reserva.html', {'reserva': reserva})
+
+def guardar_reserva(request):
+    if request.method == 'POST':
+        habitacion_id = request.POST.get('habitacion_id')
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        usuario = request.POST.get('usuario')
+        # Obtener la habitación
+        habitacion = get_object_or_404(Habitacion, id=habitacion_id)
+
+        # Guardar la reserva
+        reserva = Reserva(
+            habitacion=habitacion,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            usuario=usuario,
+        )
+        reserva.save()
+
+        # Cambiar el estado de la habitación
+        habitacion.estado = 'Reservada'
+        habitacion.save()
+
+        return HttpResponse({'message': 'Reserva realizada con éxito'})
+
+    return HttpResponse({'error': 'Método no permitido'}, status=405)

@@ -16,9 +16,9 @@ class Reserva(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     usuario = models.CharField(max_length=255)
-    total_pago = models.DecimalField(max_digits=10, decimal_places=2)
-    estado = models.CharField(max_length=20, choices=[('pendiente', 'Pendiente'), ('pagado', 'Pagado')])
-
+    total_pago = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Hacerlo opcional
+    estado = models.CharField(max_length=20, choices=[('pendiente', 'Pendiente'), ('pagado', 'Pagado')], null=True, blank=True)  # Hacerlo opcional
+    
     def disponibilidad(self):
         # Verificar si hay reservas existentes en las fechas solicitadas
         reservas_existentes = Reserva.objects.filter(

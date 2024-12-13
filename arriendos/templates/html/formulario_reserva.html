@@ -6,7 +6,7 @@
     <title>Formulario de Reserva</title>
 </head>
 <body>
-    <h1>Formulario de Reserva para la Habitación {{ habitacion.numero }}</h1>
+    <h1>Formulario de Reserva {{ habitacion.numero }}</h1>
     
     <form action="{% url 'crear_reserva' %}" method="POST">
         {% csrf_token %}

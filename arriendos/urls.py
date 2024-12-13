@@ -37,4 +37,6 @@ urlpatterns = [
 
     # Confirmación de reserva
     path('reservas/confirmacion/<int:reserva_id>/', views.confirmacion_reserva, name='confirmacion_reserva'),
+
+    path('guardar_reserva/', views.guardar_reserva, name='guardar_reserva'),
 ]

@@ -4,32 +4,183 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Reserva</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Estilos generales del cuerpo */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo para el título */
+        h1 {
+            color: #00796B;
+            margin-top: 30px;
+            font-size: 28px;
+        }
+
+        /* Estilo para el formulario */
+        #reserva-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        /* Estilo para las etiquetas del formulario */
+        label {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Estilo para los campos de entrada */
+        input[type="date"], input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Estilo para el botón de reserva */
+        button {
+            background-color: #00796B;
+            color: white;
+            font-size: 18px;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #004d40;
+        }
+
+        /* Estilo para el mensaje de éxito */
+        #message {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+        }
+
+        /* Estilo para el enlace de volver a la página principal */
+        a {
+            font-size: 16px;
+            color: #00796B;
+            text-decoration: none;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Formulario de Reserva para la Habitación {{ habitacion.numero }}</h1>
 
-    <form method="POST">
+    <form id="reserva-form">
         {% csrf_token %}
         
         <label for="fecha_inicio">Fecha de Inicio:</label>
-        <input type="date" id="fecha_inicio" name="fecha_inicio" required><br><br>
+        <input type="date" id="fecha_inicio" name="fecha_inicio" required>
 
         <label for="fecha_fin">Fecha de Fin:</label>
-        <input type="date" id="fecha_fin" name="fecha_fin" required><br><br>
+        <input type="date" id="fecha_fin" name="fecha_fin" required>
 
         <label for="usuario">Nombre del Usuario:</label>
-        <input type="text" id="usuario" name="usuario" required><br><br>
+        <input type="text" id="usuario" name="usuario" required>
 
-        <label for="total_pago">Total a Pagar:</label>
-        <input type="number" id="total_pago" name="total_pago" step="0.01" required><br><br>
+    
 
-        <label for="estado">Estado:</label>
-        <select id="estado" name="estado" required>
-            <option value="pendiente">Pendiente</option>
-            <option value="pagado">Pagado</option>
-        </select><br><br>
-
-        <button type="submit">Hacer Reserva</button>
+        <button type="button" id="submit-btn">Hacer Reserva</button>
     </form>
+
+    <div id="message">
+        ¡Reserva realizada con éxito!
+    </div>
+
+    <a href="{% url 'home' %}">Volver a la página principal</a>
+
+    <script>
+        $(document).ready(function() {
+            // Obtén el token CSRF del cookie
+            function getCSRFToken() {
+                var name = 'csrftoken';
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        return cookie.substring(name.length + 1);
+                    }
+                }
+                return null;
+            }
+    
+            $('#submit-btn').on('click', function() {
+                // Captura los datos del formulario
+                var formData = {
+                    'fecha_inicio': $('#fecha_inicio').val(),
+                    'fecha_fin': $('#fecha_fin').val(),
+                    'usuario': $('#usuario').val(),
+                    'habitacion_id': '{{ habitacion.id }}'  // Envía el ID de la habitación
+                };
+    
+                // Envía los datos del formulario usando AJAX
+                $.ajax({
+                    url: '{% url "guardar_reserva" %}',  // URL donde enviar los datos
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRFToken': getCSRFToken()  // Agrega el token CSRF en los encabezados
+                    },
+                    success: function(response) {
+                        // Muestra el mensaje de éxito
+                        $('#message').show();
+                        $('#reserva-form').trigger('reset');  // Resetea el formulario
+                    },
+                    error: function(xhr, errmsg, err) {
+                        // Mostrar los errores específicos de la respuesta
+                        var errorMessage = "Ocurrió un error al procesar la reserva. ";
+                        if (xhr.status === 400) {
+                            errorMessage += "Error 400: Solicitud incorrecta.";
+                        } else if (xhr.status === 404) {
+                            errorMessage += "Error 404: Recurso no encontrado.";
+                        } else if (xhr.status === 500) {
+                            errorMessage += "Error 500: Error interno del servidor.";
+                        } else {
+                            errorMessage += "Detalles: " + errmsg;
+                        }
+    
+                        // Mostrar el mensaje de error en la consola y en un alert
+                        console.log("Error:", errorMessage);
+                        alert(errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
